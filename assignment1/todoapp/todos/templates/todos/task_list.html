@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Todo List</title>
+    </head>
+
+    <body>
+        <h1>Todo List</h1>
+
+        <form method="POST" action = "{% url 'add_task' %}">
+            {% csrf_token %}
+            <input type="text" name="title" placeholder="Enter a task" requried>
+
+            <button type="submit">Add task</button>
+        </form>
+
+        <hr>
+        {% if tasks %}
+            <ul>
+                {% for task in tasks %}
+                    <li>
+                        {% if task.completed %}
+                            <s>{{ task.title }}</s>
+                        {% else %}
+                            <p>{{ task.title }}</p>
+                        {% endif %}
+
+                        <form method="POST" action = "{% url 'complete_task' task.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            
+                            <button type="submit">
+                                {% if task.completed %}
+                                    <p>Undo</p>
+                                {% else %}
+                                    <p>Complete</p>
+                                {% endif %}
+                            </button>
+                        </form>
+
+                        <form method="POST" action = "{% url 'delete_task' task.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            
+                            <button type="submit">
+                                Delete
+                            </button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No tasks</p>
+        {% endif %}
+    </body>
+</html>
