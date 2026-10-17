@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Reading List{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'books/style.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="{% url 'home' %}">Reading List</a>
+            <nav>
+                <a href="{% url 'home' %}">Library</a>
+                <a href="/api/books/">API</a>
+                <a class="btn btn-primary" href="{% url 'book_add' %}">Add book</a>
+            </nav>
+        </div>
+    </header>
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+        <div class="container">Django + PostgreSQL + Docker Compose</div>
+    </footer>
+</body>
+</html>
