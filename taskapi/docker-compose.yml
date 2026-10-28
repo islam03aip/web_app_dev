@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: taskapi-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-taskuser}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-taskpass}
+      POSTGRES_DB: ${DB_NAME:-taskdb}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: taskapi-backend:latest
+    container_name: taskapi-backend
+    restart: unless-stopped
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      DEBUG: ${DEBUG:-False}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-taskuser}
+      DB_PASSWORD: ${DB_PASSWORD:-taskpass}
+      DB_NAME: ${DB_NAME:-taskdb}
+    ports:
+      - "${WEB_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  pgdata:
+    name: taskapi_pgdata
